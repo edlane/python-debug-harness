@@ -50,10 +50,10 @@ if __name__ == '__main__':
 
     adict = {'hello': 1, 'world': 2}
 
-    result = foo1(5, 4)
-    result = foo1(1, z=12)
-    result = foo1(1)
-    result = foo2(adict, adict, adict, bob=adict)
+    result = foo_1(5, 4)
+    result = foo_1(1, z=12)
+    result = foo_1(1)
+    result = foo_2(adict, adict, adict, bob=adict)
 
     result = bar(1,2,3,4,5)
 
