@@ -8,20 +8,49 @@ import json
 
 
 class Harness_globals():
-    harness_file = '/tmp/harness.json'
-    json_dict = {}
+    prog_name = __file__.split('/')[-1]
+    harness_file_name = '/tmp/harness.' + prog_name + '.json'
+    f = open(harness_file_name, 'a+')
+    f.seek(0)
+    json_string = f.read()
+    try:
+        json_dict = json.loads(json_string)
+    except:
+        json_dict = {}
+
+    @staticmethod
+    def save(parms):
+        Harness_globals.f.truncate(0)
+        print (json.dumps(Harness_globals.json_dict), file=Harness_globals.f)
+
+def harness_replay():
+    func_list = []
+    n = 0
+    print ('c : <continue>')
+    print ('q : <quit>')
+    for x in Harness_globals.json_dict:
+        print (n, ': ', x, Harness_globals.json_dict[x])
+        func_list.append(x)
+        n += 1
+
+    while True:
+        func_input = raw_input('enter function # to replay = ')
+        if func_input == 'c':
+            return
+        elif func_input == 'q':
+            exit()
+        else:
+            func_int = int(func_input)
+            function = getattr(sys.modules[__name__], func_list[func_int])
+            args = Harness_globals.json_dict[func_list[func_int]][0]
+            kwargs = Harness_globals.json_dict[func_list[func_int]][1]
+            function(*args, **kwargs)
 
 
+# decorator to save/restore function parameters at run-time
+# useful for replaying/debugging a function in a symbolic debugger such as Eclipse or Pycharm
 def harness(func):
     def inner(*args, **kwargs):
-        f = open(Harness_globals.harness_file, 'a+')
-        f.seek(0)
-        json_string = f.read()
-        try:
-            Harness_globals.json_dict = json.loads(json_string)
-        except:
-            pass
-
         if func.__name__ in Harness_globals.json_dict:
             # this function's params already existed in harness file
             # so return saved params...
@@ -33,9 +62,8 @@ def harness(func):
         # first time we have seen params for this function...
         # so save params to harness file
         Harness_globals.json_dict[func.__name__] = [args, kwargs]
-        f.truncate(0)
-        print (json.dumps(Harness_globals.json_dict), file=f)
         print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+        Harness_globals.save(Harness_globals.json_dict)
 
         return func(*args, **kwargs)
     return inner
@@ -69,6 +97,8 @@ def maxit(*args):
 
 
 if __name__ == '__main__':
+
+    harness_replay()
 
     adict = {'hello': 1, 'world': 2}
 
