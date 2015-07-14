@@ -23,11 +23,13 @@ class Harness_globals():
         Harness_globals.f.truncate(0)
         print (json.dumps(Harness_globals.json_dict), file=Harness_globals.f)
 
-def harness_replay():
+# text menu for replaying a function using previously saved parameters
+def replay():
     func_list = []
     n = 0
     print ('c : <continue>')
     print ('q : <quit>')
+    print ('--------------')
     for x in Harness_globals.json_dict:
         print (n, ': ', x, Harness_globals.json_dict[x])
         func_list.append(x)
@@ -44,12 +46,12 @@ def harness_replay():
             function = getattr(sys.modules[__name__], func_list[func_int])
             args = Harness_globals.json_dict[func_list[func_int]][0]
             kwargs = Harness_globals.json_dict[func_list[func_int]][1]
-            function(*args, **kwargs)
+            print ('result = ', function(*args, **kwargs))
 
 
 # decorator to save/restore function parameters at run-time
 # useful for replaying/debugging a function in a symbolic debugger such as Eclipse or Pycharm
-def harness(func):
+def func_plug(func):
     def inner(*args, **kwargs):
         if func.__name__ in Harness_globals.json_dict:
             # this function's params already existed in harness file
@@ -68,26 +70,26 @@ def harness(func):
         return func(*args, **kwargs)
     return inner
 
-@harness
+@func_plug
 def foo_1(x, y=1, **kwargs):
     return x * y
 
-@harness
+@func_plug
 def foo_2(*args, **kwargs):
     return 2
 
-@harness
+@func_plug
 def bar(a,b,c,d,e):
     return a + b + c + d + e
 
-@harness
+@func_plug
 def add(*args):
     result = 0
     for x in args:
         result = result + x
     return result
 
-@harness
+@func_plug
 def maxit(*args):
     amax = args[0]
     for x in args:
@@ -98,7 +100,7 @@ def maxit(*args):
 
 if __name__ == '__main__':
 
-    harness_replay()
+    replay()
 
     adict = {'hello': 1, 'world': 2}
 
