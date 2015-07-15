@@ -6,6 +6,7 @@ __author__ = 'ed'
 import sys
 import json
 
+prog_name = __file__.split('/')[-1]
 
 class Harness_globals():
     prog_name = __file__.split('/')[-1]
@@ -31,18 +32,23 @@ def replay():
     print ('q : <quit>')
     print ('--------------')
     for x in Harness_globals.json_dict:
-        print (n, ': ', x, Harness_globals.json_dict[x])
+        print (n, ': ', x)
+        # print (n, ': ', x, Harness_globals.json_dict[x])
         func_list.append(x)
         n += 1
 
     while True:
-        func_input = raw_input('enter function # to replay = ')
+        func_input = raw_input('\nenter function # to replay ===> ')
         if func_input == 'c':
             return
         elif func_input == 'q':
             exit()
         else:
             func_int = int(func_input)
+            print (Harness_globals.json_dict[func_list[func_int]])
+            func_input = raw_input('proceed using these parameters??? (Y/n) ===> ')
+            if func_input not in 'Yy':
+                continue
             function = getattr(sys.modules[__name__], func_list[func_int])
             args = Harness_globals.json_dict[func_list[func_int]][0]
             kwargs = Harness_globals.json_dict[func_list[func_int]][1]
@@ -58,7 +64,7 @@ def func_plug(func):
             # so return saved params...
             args = Harness_globals.json_dict[func.__name__][0]
             kwargs = Harness_globals.json_dict[func.__name__][1]
-            print ('restoring "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+            # print ('restoring "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
             return func(*args, **kwargs)
 
         # first time we have seen params for this function...
