@@ -27,17 +27,18 @@ class Harness_globals():
 # text menu for replaying a function using previously saved parameters
 def replay():
     func_list = []
-    n = 0
-    print ('c : <continue>')
-    print ('q : <quit>')
-    print ('--------------')
     for x in Harness_globals.json_dict:
-        print (n, ': ', x)
-        # print (n, ': ', x, Harness_globals.json_dict[x])
         func_list.append(x)
-        n += 1
 
     while True:
+        print ('c : <continue>')
+        print ('q : <quit>')
+        print ('--------------')
+        n = 0
+        for x in func_list:
+            print (n, ':', x)
+            n += 1
+
         func_input = raw_input('\nenter function # to replay ===> ')
         if func_input == 'c':
             return
@@ -45,14 +46,24 @@ def replay():
             exit()
         else:
             func_int = int(func_input)
-            print (Harness_globals.json_dict[func_list[func_int]])
+            # print (Harness_globals.json_dict[func_list[func_int]])
+            print ('function =', func_list[func_int])
+            print ('*args = ')
+            for each in Harness_globals.json_dict[func_list[func_int]][0]:
+                # print *args
+                print (each)
+            print ('**kwargs = ')
+            for each in Harness_globals.json_dict[func_list[func_int]][1]:
+                # print **kwargs
+                print (each, ' = ', Harness_globals.json_dict[func_list[func_int]][1][each] )
+
             func_input = raw_input('proceed using these parameters??? (Y/n) ===> ')
             if func_input not in 'Yy':
                 continue
             function = getattr(sys.modules[__name__], func_list[func_int])
             args = Harness_globals.json_dict[func_list[func_int]][0]
             kwargs = Harness_globals.json_dict[func_list[func_int]][1]
-            print ('result = ', function(*args, **kwargs))
+            print ('result = ', function(*args, **kwargs), '\n')
 
 
 # decorator to save/restore function parameters at run-time
