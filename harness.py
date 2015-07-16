@@ -20,7 +20,7 @@ class Harness_globals():
         json_dict = {}
 
     @staticmethod
-    def save(parms):
+    def save():
         Harness_globals.f.truncate(0)
         print (json.dumps(Harness_globals.json_dict), file=Harness_globals.f)
 
@@ -53,17 +53,24 @@ def replay():
                 # print *args
                 print (each)
             print ('**kwargs = ')
-            for each in Harness_globals.json_dict[func_list[func_int]][1]:
+            for each in sorted(Harness_globals.json_dict[func_list[func_int]][1]):
                 # print **kwargs
-                print (each, ' = ', Harness_globals.json_dict[func_list[func_int]][1][each] )
+                print (each, '=', Harness_globals.json_dict[func_list[func_int]][1][each] )
 
-            func_input = raw_input('proceed using these parameters??? (Y/n) ===> ')
-            if func_input not in 'Yy':
+            func_input = raw_input('proceed using these parameters??? (Y/n) (x=delete) ===> ')
+            if func_input == '':
+                # No input default to a 'Y'
+                func_input = 'Y'
+            if func_input in 'x':
+                del(Harness_globals.json_dict[func_list[func_int]])
+                del(func_list[func_int])
+                Harness_globals.save()
                 continue
-            function = getattr(sys.modules[__name__], func_list[func_int])
-            args = Harness_globals.json_dict[func_list[func_int]][0]
-            kwargs = Harness_globals.json_dict[func_list[func_int]][1]
-            print ('result = ', function(*args, **kwargs), '\n')
+            if func_input in 'Yy':
+                function = getattr(sys.modules[__name__], func_list[func_int])
+                args = Harness_globals.json_dict[func_list[func_int]][0]
+                kwargs = Harness_globals.json_dict[func_list[func_int]][1]
+                print ('result = ', function(*args, **kwargs), '\n')
 
 
 # decorator to save/restore function parameters at run-time
@@ -82,7 +89,7 @@ def func_plug(func):
         # so save params to harness file
         Harness_globals.json_dict[func.__name__] = [args, kwargs]
         print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
-        Harness_globals.save(Harness_globals.json_dict)
+        Harness_globals.save()
 
         return func(*args, **kwargs)
     return inner
@@ -114,27 +121,4 @@ def maxit(*args):
             amax = x
     return amax
 
-
-if __name__ == '__main__':
-
-    replay()
-
-    adict = {'hello': 1, 'world': 2}
-
-    result = foo_1(5, 4)
-    print ('result = ' + str(result))
-    result = foo_1(1, z=12)
-    print ('result = ' + str(result))
-    result = foo_1(1)
-    print ('result = ' + str(result))
-    result = foo_2(adict, adict, adict, adict,
-                   adict, adict, adict, adict,
-                   adict, adict, adict, bob=adict)
-    print ('result = ' + str(result))
-    result = bar(1,2,3,4,5)
-    print ('result = ' + str(result))
-    result = add(1,2,3,4,5)
-    print ('result = ' + str(result))
-    result = maxit(10,222,3,43,55)
-    print ('result = ' + str(result))
 
