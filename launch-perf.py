@@ -2,10 +2,13 @@
 __author__ = 'ed'
 import os
 import sys
+from resource import getrusage as resource_usage, RUSAGE_SELF
+from time import time as timestamp
+
 from multiprocessing import Process, Queue, Pipe
 
 
-def trueit():
+def trueit_local():
     return True
 
 def trueit_queue(q):
@@ -18,32 +21,51 @@ def trueit_pipe(conn):
 
 if __name__ == '__main__':
 
-    reps = int(sys.argv[2])
-    if sys.argv[1] == '1':
-        for i in xrange(1, reps):
-            os.system('true')
 
-    elif sys.argv[1] == '2':
-        for i in xrange(1, reps):
-            trueit()
+    reps = int(sys.argv[1])
+    for test in sys.argv[2:]:
+        start_time, start_resources = timestamp(), resource_usage(RUSAGE_SELF)
+        if test == '1':
+            print('os.system(\'true\') =')
+            for i in xrange(1, reps):
+                os.system('true')
 
-    elif sys.argv[1] == '3':
-        for i in xrange(1, reps):
-            command = "./launchit.py 2 1"
-            os.system(command)
+        elif test == '2':
+            print('python local call, \'True\' =')
+            for i in xrange(1, reps):
+                trueit_local()
 
-    elif sys.argv[1] == '4':
-        q = Queue()
-        for i in xrange(1, reps):
-            p = Process(target=trueit_queue, args=(q,))
-            p.start()
-            r = q.get()
-            p.join()
+        elif test == 'x':
+            # print('python local call, \'True\' =')
+            for i in xrange(1, reps):
+                trueit_local()
 
-    elif sys.argv[1] == '5':
-        parent_conn, child_conn = Pipe()
-        for i in xrange(1, reps):
-            p = Process(target=trueit_pipe, args=(child_conn,))
-            p.start()
-            r = parent_conn.recv()
-            p.join()
+        elif test == '3':
+            print('os.system, python executable =')
+            for i in xrange(1, reps):
+                command = sys.argv[0] + " 2 1"
+                os.system(command)
+
+        elif test == '4':
+            q = Queue()
+            print('multiprocess, queue =')
+            for i in xrange(1, reps):
+                p = Process(target=trueit_queue, args=(q,))
+                p.start()
+                r = q.get()
+                p.join()
+
+        elif test == '5':
+            print('multiprocess, pipe =')
+            parent_conn, child_conn = Pipe()
+            for i in xrange(1, reps):
+                p = Process(target=trueit_pipe, args=(child_conn,))
+                p.start()
+                r = parent_conn.recv()
+                p.join()
+
+        end_resources, end_time = resource_usage(RUSAGE_SELF), timestamp()
+
+        print ({'real': end_time - start_time,
+            'sys': end_resources.ru_stime - start_resources.ru_stime,
+            'user': end_resources.ru_utime - start_resources.ru_utime})
