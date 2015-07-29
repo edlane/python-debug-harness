@@ -33,11 +33,26 @@ def maxit(*args):
             amax = x
     return amax
 
+
+class weird_stuff():
+
+    a = 'string'
+    b = 10
+    def seta(self, x):
+        self.b = x
+
+
 if __name__ == "__main__":
+
+    ws = weird_stuff()
+    ws.seta(5)
 
     harness.replay()
 
     adict = {'hello': 1, 'world': 2}
+
+    result = foo_2(ws)
+    print ('result = ' + str(result))
 
     result = foo_1(5, 4)
     print ('result = ' + str(result))

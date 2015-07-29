@@ -1,28 +1,30 @@
 #!/usr/bin/python
 from __future__ import print_function
 
-__author__ = 'ed'
+__author__ = 'ed lane'
 
 import sys
-import json
+import jsonpickle
 
 prog_name = __file__.split('/')[-1]
 
+
 class Harness_globals():
     prog_name = __file__.split('/')[-1]
-    harness_file_name = '/tmp/harness.' + prog_name + '.json'
+    harness_file_name = '/tmp/harness.' + prog_name + '.jsonpkl'
     f = open(harness_file_name, 'a+')
     f.seek(0)
     json_string = f.read()
     try:
-        json_dict = json.loads(json_string)
+        json_dict = jsonpickle.loads(json_string)
     except:
         json_dict = {}
 
     @staticmethod
     def save():
         Harness_globals.f.truncate(0)
-        print (json.dumps(Harness_globals.json_dict), file=Harness_globals.f)
+        print (jsonpickle.dumps(Harness_globals.json_dict), file=Harness_globals.f)
+
 
 # text menu for replaying a function using previously saved parameters
 def replay():
@@ -94,6 +96,7 @@ def func_plug(func):
         return func(*args, **kwargs)
     return inner
 
+
 @func_plug
 def foo_1(x, y=1, **kwargs):
     return x * y
@@ -120,5 +123,7 @@ def maxit(*args):
         if x > amax:
             amax = x
     return amax
+
+
 
 
