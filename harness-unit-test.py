@@ -4,6 +4,7 @@ from __future__ import print_function
 __author__ = 'ed'
 
 import sys
+import time
 import harness
 
 @harness.func_plug
@@ -32,6 +33,10 @@ def maxit(*args):
         if x > amax:
             amax = x
     return amax
+
+@harness.func_plug
+def mytime(dt):
+    return dt
 
 
 class weird_stuff():
@@ -72,3 +77,5 @@ if __name__ == "__main__":
     print ('result = ' + str(result))
     result = maxit(10,222,3,43,55)
     print ('result = ' + str(result))
+    result = mytime(time.time())
+    print ('result =' + str(result))

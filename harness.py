@@ -11,7 +11,7 @@ prog_name = __file__.split('/')[-1]
 
 class Harness_globals():
     prog_name = __file__.split('/')[-1]
-    harness_file_name = '/tmp/harness.' + prog_name + '.jsonpkl'
+    harness_file_name = '/tmp/harness.' + prog_name.split('.')[0:-1] + '.jsonpkl'
     f = open(harness_file_name, 'a+')
     f.seek(0)
     json_string = f.read()
@@ -35,6 +35,7 @@ def replay():
     while True:
         print ('c : <continue>')
         print ('q : <quit>')
+        print ('d : <disable menu>')
         print ('--------------')
         n = 0
         for x in func_list:
@@ -46,6 +47,10 @@ def replay():
             return
         elif func_input == 'q':
             exit()
+        elif func_input == 'd':
+            Harness_globals.json_dict['__enable_menu__'] = True
+            Harness_globals.save()
+            return
         else:
             func_int = int(func_input)
             # print (Harness_globals.json_dict[func_list[func_int]])
@@ -95,35 +100,4 @@ def func_plug(func):
 
         return func(*args, **kwargs)
     return inner
-
-
-@func_plug
-def foo_1(x, y=1, **kwargs):
-    return x * y
-
-@func_plug
-def foo_2(*args, **kwargs):
-    return 2
-
-@func_plug
-def bar(a,b,c,d,e):
-    return a + b + c + d + e
-
-@func_plug
-def add(*args):
-    result = 0
-    for x in args:
-        result = result + x
-    return result
-
-@func_plug
-def maxit(*args):
-    amax = args[0]
-    for x in args:
-        if x > amax:
-            amax = x
-    return amax
-
-
-
 
