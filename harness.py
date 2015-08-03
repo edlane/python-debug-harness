@@ -38,7 +38,7 @@ def replay():
         print ('d : <disable menu>')
         print ('--------------')
         n = 0
-        for x in func_list:
+        for x in sorted(func_list):
             print (n, ':', x)
             n += 1
 
