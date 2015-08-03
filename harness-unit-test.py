@@ -5,6 +5,7 @@ __author__ = 'ed'
 
 import sys
 import time
+import datetime
 import harness
 
 @harness.func_plug
@@ -38,6 +39,10 @@ def maxit(*args):
 def mytime(dt):
     return dt
 
+@harness.func_plug
+def mydate(dt):
+    return dt
+
 
 class weird_stuff():
 
@@ -46,13 +51,9 @@ class weird_stuff():
     def seta(self, x):
         self.b = x
 
-
-if __name__ == "__main__":
-
+def main():
     ws = weird_stuff()
     ws.seta(5)
-
-    harness.replay()
 
     adict = {'hello': 1, 'world': 2}
 
@@ -79,3 +80,12 @@ if __name__ == "__main__":
     print ('result = ' + str(result))
     result = mytime(time.time())
     print ('result =' + str(result))
+    result = mydate(datetime.date.today())
+    print ('result =' + str(result))
+
+
+if __name__ == "__main__":
+    harness.replay()
+    main()
+
+
