@@ -29,7 +29,7 @@ class Harness_globals():
 # text menu for replaying a function using previously saved parameters
 def replay():
     func_list = []
-    for x in Harness_globals.json_dict:
+    for x in sorted(Harness_globals.json_dict):
         func_list.append(x)
 
     while True:
@@ -38,7 +38,7 @@ def replay():
         print ('d : <disable menu>')
         print ('--------------')
         n = 0
-        for x in sorted(func_list):
+        for x in func_list:
             print (n, ':', x)
             n += 1
 
