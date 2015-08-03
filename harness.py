@@ -11,7 +11,7 @@ prog_name = __file__.split('/')[-1]
 
 class Harness_globals():
     prog_name = __file__.split('/')[-1]
-    harness_file_name = '/tmp/harness.' + prog_name.split('.')[0:-1] + '.jsonpkl'
+    harness_file_name = '/tmp/harness-' + prog_name.rsplit('.', 1)[0] + '.jsonpkl'
     f = open(harness_file_name, 'a+')
     f.seek(0)
     json_string = f.read()
