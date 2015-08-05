@@ -1,33 +1,34 @@
 #!/usr/bin/python
 from __future__ import print_function
 
-__author__ = 'ed'
+__author__ = 'ed lane'
 
 import sys
 import time
-import datetime
+# import datetime
+from datetime import datetime, date, time
 import harness
 
-@harness.func_plug
+@harness.decor_plug(False)
 def foo_1(x, y=1, **kwargs):
     return x * y
 
-@harness.func_plug
+@harness.decor_plug(False)
 def foo_2(*args, **kwargs):
     return 2
 
-@harness.func_plug
+@harness.decor_plug(False)
 def bar(a,b,c,d,e):
     return a + b + c + d + e
 
-@harness.func_plug
+@harness.decor_plug(False)
 def add(*args):
     result = 0
     for x in args:
         result = result + x
     return result
 
-@harness.func_plug
+@harness.decor_plug(False)
 def maxit(*args):
     amax = args[0]
     for x in args:
@@ -35,12 +36,12 @@ def maxit(*args):
             amax = x
     return amax
 
-@harness.func_plug
-def mytime(dt):
+@harness.decor_plug(False)
+def first_time(dt):
     return dt
 
-@harness.func_plug
-def mydate(dt):
+@harness.decor_plug(True)
+def last_time(dt):
     return dt
 
 
@@ -78,10 +79,10 @@ def main():
     print ('result = ' + str(result))
     result = maxit(10,222,3,43,55)
     print ('result = ' + str(result))
-    result = mytime(time.time())
-    print ('result =' + str(result))
-    result = mydate(datetime.date.today())
-    print ('result =' + str(result))
+    result = first_time(datetime.now())
+    print ('result = ' + str(result))
+    result = last_time(datetime.now())
+    print ('result = ' + str(result))
 
 
 if __name__ == "__main__":

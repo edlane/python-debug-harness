@@ -82,22 +82,25 @@ def replay():
 
 # decorator to save/restore function parameters at run-time
 # useful for replaying/debugging a function in a symbolic debugger such as Eclipse or Pycharm
-def func_plug(func):
-    def inner(*args, **kwargs):
-        if func.__name__ in Harness_globals.json_dict:
-            # this function's params already existed in harness file
-            # so return saved params...
-            args = Harness_globals.json_dict[func.__name__][0]
-            kwargs = Harness_globals.json_dict[func.__name__][1]
-            # print ('restoring "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+def decor_plug(replace):
+    def func_plug(func):
+        def inner(*args, **kwargs):
+            if func.__name__ in Harness_globals.json_dict and not replace:
+                # this function's params already existed in harness file
+                # so return saved params...
+                args = Harness_globals.json_dict[func.__name__][0]
+                kwargs = Harness_globals.json_dict[func.__name__][1]
+                # print ('restoring "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+                return func(*args, **kwargs)
+
+            # first time we have seen params for this function...
+            # OR the decorator specified replacement on every call
+            # so save params to harness file
+            Harness_globals.json_dict[func.__name__] = [args, kwargs]
+            print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+            Harness_globals.save()
+
             return func(*args, **kwargs)
-
-        # first time we have seen params for this function...
-        # so save params to harness file
-        Harness_globals.json_dict[func.__name__] = [args, kwargs]
-        print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
-        Harness_globals.save()
-
-        return func(*args, **kwargs)
-    return inner
+        return inner
+    return func_plug
 
