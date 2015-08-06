@@ -83,10 +83,10 @@ def replay():
 
 # decorator to save/restore function parameters at run-time
 # useful for replaying/debugging a function in a symbolic debugger such as Eclipse or Pycharm
-def decor_plug(when):
+def decor_plug(recall):
     def func_plug(func):
         def inner(*args, **kwargs):
-            if func.__name__ in Harness_globals.json_dict and when == 0:
+            if func.__name__ in Harness_globals.json_dict and recall == FIRST:
                 # this function's params already existed in harness file
                 # so return saved params...
                 args = Harness_globals.json_dict[func.__name__][0]
