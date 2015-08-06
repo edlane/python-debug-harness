@@ -9,26 +9,26 @@ import time
 from datetime import datetime, date, time
 import harness
 
-@harness.decor_plug(False)
+@harness.decor_plug(harness.FIRST)
 def foo_1(x, y=1, **kwargs):
     return x * y
 
-@harness.decor_plug(False)
+@harness.decor_plug(harness.FIRST)
 def foo_2(*args, **kwargs):
     return 2
 
-@harness.decor_plug(False)
+@harness.decor_plug(harness.FIRST)
 def bar(a,b,c,d,e):
     return a + b + c + d + e
 
-@harness.decor_plug(False)
+@harness.decor_plug(harness.FIRST)
 def add(*args):
     result = 0
     for x in args:
         result = result + x
     return result
 
-@harness.decor_plug(False)
+@harness.decor_plug(harness.FIRST)
 def maxit(*args):
     amax = args[0]
     for x in args:
@@ -36,11 +36,11 @@ def maxit(*args):
             amax = x
     return amax
 
-@harness.decor_plug(False)
+@harness.decor_plug(harness.FIRST)
 def first_time(dt):
     return dt
 
-@harness.decor_plug(True)
+@harness.decor_plug(harness.LAST)
 def last_time(dt):
     return dt
 

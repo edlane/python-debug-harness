@@ -7,6 +7,10 @@ import sys
 import jsonpickle
 
 
+FIRST = 0
+LAST = 1
+ALL = 2
+
 class Harness_globals():
     harness_file_name = '/tmp/harness-' + sys.argv[0].rsplit('/', 1)[1].rsplit('.', 1)[0] + '.jsonpkl'
     f = open(harness_file_name, 'a+')
@@ -79,10 +83,10 @@ def replay():
 
 # decorator to save/restore function parameters at run-time
 # useful for replaying/debugging a function in a symbolic debugger such as Eclipse or Pycharm
-def decor_plug(replace):
+def decor_plug(when):
     def func_plug(func):
         def inner(*args, **kwargs):
-            if func.__name__ in Harness_globals.json_dict and not replace:
+            if func.__name__ in Harness_globals.json_dict and when == 0:
                 # this function's params already existed in harness file
                 # so return saved params...
                 args = Harness_globals.json_dict[func.__name__][0]
