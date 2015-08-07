@@ -16,6 +16,7 @@ class Harness_globals():
     f = open(harness_file_name, 'a+')
     f.seek(0)
     json_string = f.read()
+    json_dict = {}
     try:
         json_dict = jsonpickle.loads(json_string)
     except:
@@ -57,13 +58,13 @@ def replay():
             # print (Harness_globals.json_dict[func_list[func_int]])
             print ('function =', func_list[func_int])
             print ('*args = ')
-            for each in Harness_globals.json_dict[func_list[func_int]][0]:
+            for each in Harness_globals.json_dict[func_list[func_int]][FIRST][0]:
                 # print *args
                 print (each)
             print ('**kwargs = ')
-            for each in sorted(Harness_globals.json_dict[func_list[func_int]][1]):
+            for each in sorted(Harness_globals.json_dict[func_list[func_int]][FIRST][1]):
                 # print **kwargs
-                print (each, '=', Harness_globals.json_dict[func_list[func_int]][1][each] )
+                print (each, '=', Harness_globals.json_dict[func_list[func_int]][FIRST][1][each])
 
             func_input = raw_input('proceed using these parameters??? (Y/n) (x=delete) ===> ')
             if func_input == '':
@@ -75,29 +76,31 @@ def replay():
                 Harness_globals.save()
                 continue
             if func_input in 'Yy':
-                function = getattr(sys.modules[__name__], func_list[func_int])
-                args = Harness_globals.json_dict[func_list[func_int]][0]
-                kwargs = Harness_globals.json_dict[func_list[func_int]][1]
+                function = getattr(sys.modules['__main__'], func_list[func_int])
+                args = Harness_globals.json_dict[func_list[func_int]][FIRST][0]
+                kwargs = Harness_globals.json_dict[func_list[func_int]][FIRST][1]
                 print ('result = ', function(*args, **kwargs), '\n')
 
 
 # decorator to save/restore function parameters at run-time
-# useful for replaying/debugging a function in a symbolic debugger such as Eclipse or Pycharm
+# This is useful for capturing function parameters and then later replaying/debugging that function in a
+# symbolic debugger such as Eclipse or Pycharm
 def decor_plug(recall):
     def func_plug(func):
         def inner(*args, **kwargs):
             if func.__name__ in Harness_globals.json_dict and recall == FIRST:
                 # this function's params already existed in harness file
                 # so return saved params...
-                args = Harness_globals.json_dict[func.__name__][0]
-                kwargs = Harness_globals.json_dict[func.__name__][1]
+                args = Harness_globals.json_dict[func.__name__][FIRST][0]
+                kwargs = Harness_globals.json_dict[func.__name__][FIRST][1]
                 # print ('restoring "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
                 return func(*args, **kwargs)
 
             # first time we have seen params for this function...
             # OR the decorator specified replacement on every call
             # so save params to harness file
-            Harness_globals.json_dict[func.__name__] = [args, kwargs]
+            Harness_globals.json_dict[func.__name__] = []
+            Harness_globals.json_dict[func.__name__].append([args, kwargs])
             print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
             Harness_globals.save()
 
@@ -105,3 +108,10 @@ def decor_plug(recall):
         return inner
     return func_plug
 
+
+@decor_plug(FIRST)
+def multiply(*args):
+    result = 0
+    for x in args:
+        result = result * x
+    return result

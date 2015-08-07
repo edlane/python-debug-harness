@@ -84,6 +84,9 @@ def main():
     result = last_time(datetime.now())
     print ('result = ' + str(result))
 
+    result = harness.multiply(1, 2, 3, 4)
+    print ('result = ' + str(result))
+
 
 if __name__ == "__main__":
     harness.replay()
