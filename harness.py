@@ -76,7 +76,8 @@ def replay():
                 Harness_globals.save()
                 continue
             if func_input in 'Yy':
-                function = getattr(sys.modules['__main__'], func_list[func_int])
+                module_name = Harness_globals.json_dict[func_list[func_int]][FIRST][2]
+                function = getattr(sys.modules[module_name], func_list[func_int])
                 args = Harness_globals.json_dict[func_list[func_int]][FIRST][0]
                 kwargs = Harness_globals.json_dict[func_list[func_int]][FIRST][1]
                 print ('result = ', function(*args, **kwargs), '\n')
@@ -100,7 +101,7 @@ def decor_plug(recall):
             # OR the decorator specified replacement on every call
             # so save params to harness file
             Harness_globals.json_dict[func.__name__] = []
-            Harness_globals.json_dict[func.__name__].append([args, kwargs])
+            Harness_globals.json_dict[func.__name__].append([args, kwargs, func.func_globals['__name__']])
             print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
             Harness_globals.save()
 
@@ -111,7 +112,7 @@ def decor_plug(recall):
 
 @decor_plug(FIRST)
 def multiply(*args):
-    result = 0
+    result = 1
     for x in args:
         result = result * x
     return result
