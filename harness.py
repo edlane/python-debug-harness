@@ -11,6 +11,10 @@ FIRST = 0
 LAST = 1
 ALL = 2
 
+ARGS = 0
+KWARGS = 1
+
+
 class Harness_globals():
     harness_file_name = '/tmp/harness-' + sys.argv[0].rsplit('/', 1)[1].rsplit('.', 1)[0] + '.jsonpkl'
     f = open(harness_file_name, 'a+')
@@ -58,13 +62,12 @@ def replay():
             # print (Harness_globals.json_dict[func_list[func_int]])
             print ('function =', func_list[func_int])
             print ('*args = ')
-            for each in Harness_globals.json_dict[func_list[func_int]][FIRST][0]:
+            for each in Harness_globals.json_dict[func_list[func_int]][FIRST][ARGS]:
                 # print *args
                 print (each)
             print ('**kwargs = ')
-            for each in sorted(Harness_globals.json_dict[func_list[func_int]][FIRST][1]):
-                # print **kwargs
-                print (each, '=', Harness_globals.json_dict[func_list[func_int]][FIRST][1][each])
+            for each in sorted(Harness_globals.json_dict[func_list[func_int]][FIRST][KWARGS]):
+                print (each, '=', Harness_globals.json_dict[func_list[func_int]][FIRST][KWARGS][each])
 
             func_input = raw_input('proceed using these parameters??? (Y/n) (x=delete) ===> ')
             if func_input == '':
@@ -76,41 +79,42 @@ def replay():
                 Harness_globals.save()
                 continue
             if func_input in 'Yy':
-                module_name = Harness_globals.json_dict[func_list[func_int]][FIRST][2]
-                function = getattr(sys.modules[module_name], func_list[func_int])
-                args = Harness_globals.json_dict[func_list[func_int]][FIRST][0]
-                kwargs = Harness_globals.json_dict[func_list[func_int]][FIRST][1]
-                print ('result = ', function(*args, **kwargs), '\n')
+                module_name = func_list[func_int].split('.')[0]
+                function_name = func_list[func_int].split('.')[1]
+                function = getattr(sys.modules[module_name], function_name)
+                args = Harness_globals.json_dict[func_list[func_int]][FIRST][ARGS]
+                kwargs = Harness_globals.json_dict[func_list[func_int]][FIRST][KWARGS]
+                print ('function = ', func_list[func_int], 'result = ', function(*args, **kwargs), '\n')
 
 
 # decorator to save/restore function parameters at run-time
 # This is useful for capturing function parameters and then later replaying/debugging that function in a
 # symbolic debugger such as Eclipse or Pycharm
-def decor_plug(recall):
-    def func_plug(func):
+def decor_record(recall):
+    def func_record(func):
         def inner(*args, **kwargs):
-            if func.__name__ in Harness_globals.json_dict and recall == FIRST:
+            mod_func_name = func.func_globals['__name__'] + '.' + func.__name__
+            if mod_func_name in Harness_globals.json_dict and recall == FIRST:
                 # this function's params already existed in harness file
                 # so return saved params...
-                args = Harness_globals.json_dict[func.__name__][FIRST][0]
-                kwargs = Harness_globals.json_dict[func.__name__][FIRST][1]
-                # print ('restoring "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+                args = Harness_globals.json_dict[mod_func_name][FIRST][ARGS]
+                kwargs = Harness_globals.json_dict[mod_func_name][FIRST][KWARGS]
                 return func(*args, **kwargs)
 
             # first time we have seen params for this function...
             # OR the decorator specified replacement on every call
             # so save params to harness file
-            Harness_globals.json_dict[func.__name__] = []
-            Harness_globals.json_dict[func.__name__].append([args, kwargs, func.func_globals['__name__']])
-            print ('saving "[*args, **kwargs]" for ' + func.__name__ + ' = ' + repr([args, kwargs]))
+            Harness_globals.json_dict[mod_func_name] = []
+            Harness_globals.json_dict[mod_func_name].append([args, kwargs])
+            print ('saving... ' + mod_func_name + ' [*args, **kwargs] = ' + repr([args, kwargs]))
             Harness_globals.save()
 
             return func(*args, **kwargs)
         return inner
-    return func_plug
+    return func_record
 
 
-@decor_plug(FIRST)
+@decor_record(FIRST)
 def multiply(*args):
     result = 1
     for x in args:

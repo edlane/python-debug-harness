@@ -9,26 +9,26 @@ import time
 from datetime import datetime, date, time
 import harness
 
-@harness.decor_plug(harness.FIRST)
+@harness.decor_record(harness.FIRST)
 def foo_1(x, y=1, **kwargs):
     return x * y
 
-@harness.decor_plug(harness.FIRST)
+@harness.decor_record(harness.FIRST)
 def foo_2(*args, **kwargs):
     return 2
 
-@harness.decor_plug(harness.FIRST)
+@harness.decor_record(harness.FIRST)
 def bar(a,b,c,d,e):
     return a + b + c + d + e
 
-@harness.decor_plug(harness.FIRST)
+@harness.decor_record(harness.FIRST)
 def add(*args):
     result = 0
     for x in args:
         result = result + x
     return result
 
-@harness.decor_plug(harness.FIRST)
+@harness.decor_record(harness.FIRST)
 def maxit(*args):
     amax = args[0]
     for x in args:
@@ -36,11 +36,11 @@ def maxit(*args):
             amax = x
     return amax
 
-@harness.decor_plug(harness.FIRST)
+@harness.decor_record(harness.FIRST)
 def first_time(dt):
     return dt
 
-@harness.decor_plug(harness.LAST)
+@harness.decor_record(harness.LAST)
 def last_time(dt):
     return dt
 
@@ -59,37 +59,38 @@ def main():
     adict = {'hello': 1, 'world': 2}
 
     result = foo_2(ws)
-    print ('result = ' + str(result))
+    print ('foo_2 result = ' + str(result))
 
     result = foo_1(5, 4)
-    print ('result = ' + str(result))
+    print ('foo_1 result = ' + str(result))
     result = foo_1(1, z=12)
-    print ('result = ' + str(result))
+    print ('foo_1 result = ' + str(result))
     result = foo_1(1)
-    print ('result = ' + str(result))
+    print ('foo_1 result = ' + str(result))
     result = foo_2(adict, adict, adict, adict,
                    adict, adict, adict, adict,
                    alice='alice',
                    charles='chuck',
                    bob=adict,)
-    print ('result = ' + str(result))
+    print ('foo_2 result = ' + str(result))
     result = bar(1,2,3,4,5)
-    print ('result = ' + str(result))
+    print ('bar result = ' + str(result))
     result = add(1,2,3,4,5)
-    print ('result = ' + str(result))
+    print ('add result = ' + str(result))
     result = maxit(10,222,3,43,55)
-    print ('result = ' + str(result))
+    print ('maxit result = ' + str(result))
     result = first_time(datetime.now())
-    print ('result = ' + str(result))
+    print ('first_time result = ' + str(result))
     result = last_time(datetime.now())
-    print ('result = ' + str(result))
+    print ('last_time result = ' + str(result))
 
     result = harness.multiply(1, 2, 3, 4)
-    print ('result = ' + str(result))
+    print ('harness.multiply result = ' + str(result))
 
 
 if __name__ == "__main__":
-    harness.replay()
-    main()
+    while True:
+        harness.replay()
+        main()
 
 
