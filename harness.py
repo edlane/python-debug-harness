@@ -61,15 +61,21 @@ def replay():
             func_int = int(func_input)
             # print (Harness_globals.json_dict[func_list[func_int]])
             print ('function =', func_list[func_int])
-            print ('*args = ')
-            for each in Harness_globals.json_dict[func_list[func_int]][FIRST][ARGS]:
-                # print *args
-                print (each)
-            print ('**kwargs = ')
-            for each in sorted(Harness_globals.json_dict[func_list[func_int]][FIRST][KWARGS]):
-                print (each, '=', Harness_globals.json_dict[func_list[func_int]][FIRST][KWARGS][each])
+            more = len(Harness_globals.json_dict[func_list[func_int]]) > 1
+            i = 0
+            for every in Harness_globals.json_dict[func_list[func_int]]:
+                if more:
+                    print ('----------- ', i)
+                    i += 1
+                print ('*args = ')
+                for each in sorted(every[ARGS]):
+                    # print *args
+                    print (each)
+                print ('**kwargs = ')
+                for each in sorted(every[KWARGS]):
+                    print (each, '=', every[KWARGS][each])
 
-            func_input = raw_input('proceed using these parameters??? (Y/n) (x=delete) ===> ')
+            func_input = raw_input('call function using these parameters??? (Y/n) (x=delete) ===> ')
             if func_input == '':
                 # No input default to a 'Y'
                 func_input = 'Y'
@@ -103,8 +109,10 @@ def decor_record(recall):
 
             # first time we have seen params for this function...
             # OR the decorator specified replacement on every call
-            # so save params to harness file
-            Harness_globals.json_dict[mod_func_name] = []
+            # so save the params to harness file
+            if not Harness_globals.json_dict.has_key(mod_func_name) or recall == LAST:
+                Harness_globals.json_dict[mod_func_name] = []
+
             Harness_globals.json_dict[mod_func_name].append([args, kwargs])
             print ('saving... ' + mod_func_name + ' [*args, **kwargs] = ' + repr([args, kwargs]))
             Harness_globals.save()

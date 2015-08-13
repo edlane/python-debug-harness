@@ -40,6 +40,10 @@ def maxit(*args):
 def first_time(dt):
     return dt
 
+@harness.decor_record(harness.ALL)
+def every_time(dt):
+    return dt
+
 @harness.decor_record(harness.LAST)
 def last_time(dt):
     return dt
@@ -83,6 +87,8 @@ def main():
     print ('first_time result = ' + str(result))
     result = last_time(datetime.now())
     print ('last_time result = ' + str(result))
+    result = every_time(datetime.now())
+    print ('every_time result = ' + str(result))
 
     result = harness.multiply(1, 2, 3, 4)
     print ('harness.multiply result = ' + str(result))
