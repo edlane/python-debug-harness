@@ -11,8 +11,9 @@ FIRST = 0
 LAST = 1
 ALL = 2
 
-ARGS = 0
-KWARGS = 1
+ARGS = 'args'
+KWARGS = 'kwargs'
+CLASS = 2
 
 
 class Harness_globals():
@@ -113,8 +114,11 @@ def decor_record(recall):
             if not Harness_globals.json_dict.has_key(mod_func_name) or recall == LAST:
                 Harness_globals.json_dict[mod_func_name] = []
 
-            Harness_globals.json_dict[mod_func_name].append([args, kwargs])
-            print ('saving... ' + mod_func_name + ' [*args, **kwargs] = ' + repr([args, kwargs]))
+            d = {}
+            d[ARGS] = args
+            d[KWARGS] = kwargs
+            Harness_globals.json_dict[mod_func_name].append(d)
+            print ('saving... ' + mod_func_name + ' = ' + repr(d))
             Harness_globals.save()
 
             return func(*args, **kwargs)

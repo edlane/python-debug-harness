@@ -9,6 +9,13 @@ import time
 from datetime import datetime, date, time
 import harness
 
+
+class AClass():
+    @harness.decor_record(harness.FIRST)
+    def hello(self, name):
+        print ('hello, ', name)
+
+
 @harness.decor_record(harness.FIRST)
 def foo_1(x, y=1, **kwargs):
     return x * y
@@ -59,6 +66,9 @@ class weird_stuff():
 def main():
     ws = weird_stuff()
     ws.seta(5)
+
+    aclass = AClass()
+    aclass.hello('world')
 
     adict = {'hello': 1, 'world': 2}
 
