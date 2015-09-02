@@ -104,7 +104,12 @@ def decor_record(recall):
             if mod_func_name in Harness_globals.json_dict and recall == FIRST:
                 # this function's params already existed in harness file
                 # so return saved params...
-                args = Harness_globals.json_dict[mod_func_name][FIRST][ARGS]
+                if func.func_code.co_varnames[0] == 'self':
+                    args = args[:1]
+                    args += Harness_globals.json_dict[mod_func_name][FIRST][ARGS][1:]
+                    # args = Harness_globals.json_dict[mod_func_name][FIRST][ARGS]
+                else:
+                    args = Harness_globals.json_dict[mod_func_name][FIRST][ARGS]
                 kwargs = Harness_globals.json_dict[mod_func_name][FIRST][KWARGS]
                 return func(*args, **kwargs)
 
