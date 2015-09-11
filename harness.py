@@ -5,6 +5,7 @@ __author__ = 'ed lane'
 
 import sys
 import jsonpickle
+import __main__
 
 
 FIRST = 0
@@ -13,6 +14,7 @@ ALL = 2
 
 ARGS = 'args'
 KWARGS = 'kwargs'
+SELF = 'self'
 CLASS = 2
 
 
@@ -88,7 +90,12 @@ def replay():
             if func_input in 'Yy':
                 module_name = func_list[func_int].split('.')[0]
                 function_name = func_list[func_int].split('.')[1]
-                function = getattr(sys.modules[module_name], function_name)
+                if SELF in Harness_globals.json_dict[func_list[func_int]][FIRST]:
+                    # this is an class instance
+                    function = Harness_globals.json_dict[func_list[func_int]][FIRST][SELF][2]
+                else:
+                    # this is a classless "top module" function
+                    function = getattr(sys.modules[module_name], function_name)
                 args = Harness_globals.json_dict[func_list[func_int]][FIRST][ARGS]
                 kwargs = Harness_globals.json_dict[func_list[func_int]][FIRST][KWARGS]
                 print ('function = ', func_list[func_int], 'result = ', function(*args, **kwargs), '\n')
@@ -100,7 +107,11 @@ def replay():
 def decor_record(recall):
     def func_record(func):
         def inner(*args, **kwargs):
-            mod_func_name = func.func_globals['__name__'] + '.' + func.__name__
+            if func.func_code.co_varnames[0] == 'self':
+                class_name = args[0].__class__.__name__
+                mod_func_name = func.func_globals['__name__'] + '.' + class_name + '.' + func.__name__
+            else:
+                mod_func_name = func.func_globals['__name__'] + '.' + func.__name__
             if mod_func_name in Harness_globals.json_dict and recall == FIRST:
                 # this function's params already existed in harness file
                 # so return saved params...
@@ -125,6 +136,8 @@ def decor_record(recall):
             Harness_globals.json_dict[mod_func_name].append(d)
             print ('saving... ' + mod_func_name + ' = ' + repr(d))
             Harness_globals.save()
+            if func.func_code.co_varnames[0] == 'self':
+                Harness_globals.json_dict[mod_func_name][FIRST][SELF] = (args[0], func.func_name, func)
 
             return func(*args, **kwargs)
         return inner

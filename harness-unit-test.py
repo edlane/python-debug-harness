@@ -11,9 +11,14 @@ import harness
 
 
 class AClass():
+    a = 4
+    b = 5
+    c = 6
     @harness.decor_record(harness.FIRST)
     def hello(self, name):
         print ('hello, ', name)
+        # self.b = 12
+        return (self.a, self.b, self.c)
 
 
 @harness.decor_record(harness.FIRST)
