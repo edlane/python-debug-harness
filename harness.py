@@ -110,6 +110,7 @@ def decor_record(recall):
             if func.func_code.co_varnames[0] == 'self':
                 class_name = args[0].__class__.__name__
                 mod_func_name = func.func_globals['__name__'] + '.' + class_name + '.' + func.__name__
+                Harness_globals.json_dict[mod_func_name][FIRST][SELF] = (args[0], func.func_name, func)
             else:
                 mod_func_name = func.func_globals['__name__'] + '.' + func.__name__
             if mod_func_name in Harness_globals.json_dict and recall == FIRST:
@@ -136,8 +137,8 @@ def decor_record(recall):
             Harness_globals.json_dict[mod_func_name].append(d)
             print ('saving... ' + mod_func_name + ' = ' + repr(d))
             Harness_globals.save()
-            if func.func_code.co_varnames[0] == 'self':
-                Harness_globals.json_dict[mod_func_name][FIRST][SELF] = (args[0], func.func_name, func)
+            # if func.func_code.co_varnames[0] == 'self':
+            #     Harness_globals.json_dict[mod_func_name][FIRST][SELF] = (args[0], func.func_name, func)
 
             return func(*args, **kwargs)
         return inner
