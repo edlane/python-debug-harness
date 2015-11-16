@@ -1,6 +1,4 @@
 
-```.                 _ENVIRONMENT_                      .
-```
 
 
 | *life cycle*          | dev | demo | qa |   | enterprise |
